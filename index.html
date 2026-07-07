@@ -2,9 +2,113 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Смена тарифа / оператора</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
+
+        /* === СТРАНИЦА ВХОДА === */
+        .login-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            flex-direction: column;
+        }
+        .login-page.hidden {
+            display: none;
+        }
+        .login-box {
+            background: #111;
+            border: 2px solid #00ff41;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 60px rgba(0, 255, 65, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: flicker 3s infinite;
+        }
+        .login-box h1 {
+            color: #00ff41;
+            font-size: 28px;
+            letter-spacing: 3px;
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+            margin-bottom: 10px;
+        }
+        .login-box .sub {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .login-box input {
+            width: 100%;
+            padding: 15px;
+            background: #1a1a1a;
+            border: 2px solid #00ff41;
+            border-radius: 8px;
+            color: #00ff41;
+            font-size: 20px;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            outline: none;
+            transition: 0.3s;
+        }
+        .login-box input:focus {
+            border-color: #ff8800;
+            box-shadow: 0 0 30px rgba(255, 136, 0, 0.3);
+        }
+        .login-box input::placeholder {
+            color: #444;
+        }
+        .login-box button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 15px;
+            background: #00ff41;
+            color: #000;
+            font-size: 20px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            letter-spacing: 2px;
+        }
+        .login-box button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
+        }
+        .login-box .error {
+            color: #ff0040;
+            font-size: 14px;
+            margin-top: 10px;
+            min-height: 20px;
+            text-shadow: 0 0 10px rgba(255, 0, 64, 0.5);
+        }
+        .login-box .hint {
+            color: #666;
+            font-size: 12px;
+            margin-top: 15px;
+            border-top: 1px solid #222;
+            padding-top: 15px;
+        }
+        .login-box .hint span {
+            color: #00ff41;
+        }
+        @keyframes flicker {
+            0%, 100% { opacity:1; }
+            50% { opacity:0.85; box-shadow:0 0 60px rgba(0,255,65,0.6); }
+        }
+
+        /* === ОСНОВНОЙ КОНТЕНТ === */
         body {
             background: #0a0a0a;
             display: flex;
@@ -24,10 +128,6 @@
             border-radius: 10px;
             animation: flicker 3s infinite;
         }
-        @keyframes flicker {
-            0%, 100% { opacity:1; }
-            50% { opacity:0.85; box-shadow:0 0 60px rgba(0,255,65,0.6); }
-        }
         .header {
             text-align: center;
             border-bottom: 2px solid #00ff41;
@@ -38,8 +138,18 @@
             font-size: 26px;
             letter-spacing: 3px;
             text-transform: uppercase;
-            color: #00ff41;
-            text-shadow: 0 0 15px #00ff41;
+            font-weight: bold;
+            background: linear-gradient(90deg, #ff0000, #ff8800, #ffff00, #00ff00, #0088ff, #8800ff, #ff0088);
+            background-size: 400% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: rainbow 4s linear infinite;
+            text-shadow: 0 0 30px rgba(255,0,0,0.3);
+        }
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 400% 50%; }
         }
         .sub {
             color: #888;
@@ -222,6 +332,7 @@
             font-weight: bold;
             letter-spacing: 3px;
             text-shadow: 0 0 30px #ff4400;
+            font-family: 'Courier New', monospace;
         }
         .leak-warning p {
             color: #ff8844;
@@ -264,6 +375,40 @@
         .personal .row .text strong {
             color: #ff4444;
         }
+
+        .enemy-comment {
+            background: #1a0000;
+            padding: 15px;
+            border: 3px solid #ff0000;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
+        }
+        .enemy-comment h2 {
+            color: #ff0000;
+            font-size: 18px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 2px solid #ff0000;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px #ff0000;
+            animation: blink 0.8s infinite;
+        }
+        .enemy-comment .comment-text {
+            color: #ff4444;
+            font-size: 15px;
+            line-height: 1.6;
+            padding: 5px 10px;
+            border-left: 3px solid #ff0000;
+            font-style: italic;
+        }
+        .enemy-comment .comment-text strong {
+            color: #ff0000;
+            font-style: normal;
+        }
+
         .warning {
             color: #ff4444;
             font-size: 16px;
@@ -279,6 +424,77 @@
             0%, 100% { opacity:1; }
             50% { opacity:0.2; }
         }
+
+        /* === НАМЁК === */
+        .hint-message {
+            background: #1a001a;
+            padding: 15px;
+            border: 2px solid #ff00aa;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(255, 0, 170, 0.2);
+        }
+        .hint-message p {
+            color: #ff66cc;
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 0 0 20px rgba(255, 0, 170, 0.4);
+            animation: pulse 2s infinite;
+        }
+        .hint-message .small {
+            color: #884466;
+            font-size: 13px;
+            font-weight: normal;
+            margin-top: 5px;
+            text-shadow: none;
+        }
+
+        /* === ШПИОНЫ === */
+        .spy-message {
+            background: #001a00;
+            padding: 15px;
+            border: 2px solid #00ff41;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+        }
+        .spy-message p {
+            color: #00ff41;
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        .gallery-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: #00ff41;
+            color: #000;
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 15px 0;
+            transition: 0.3s;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+        }
+        .gallery-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 50px rgba(0, 255, 65, 0.6);
+            background: #00dd3a;
+        }
+
         .footer {
             font-size: 11px;
             text-align: center;
@@ -288,41 +504,237 @@
         .footer span {
             color: #00ff41;
         }
+
+        /* === ГАЛЕРЕЯ === */
+        .gallery-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.97);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            animation: fadeIn 0.3s ease;
+        }
+        .gallery-overlay.active {
+            display: flex;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .gallery-overlay .close-gallery {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #ff0040;
+            font-size: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            text-shadow: 0 0 30px rgba(255, 0, 64, 0.5);
+            z-index: 10001;
+            user-select: none;
+        }
+        .gallery-overlay .close-gallery:hover {
+            transform: rotate(90deg);
+            color: #ff4400;
+        }
+
+        .gallery-overlay .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            max-width: 1400px;
+            width: 95%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .gallery-overlay .gallery-grid img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #00ff41;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+        }
+        .gallery-overlay .gallery-grid img:hover {
+            transform: scale(1.05);
+            border-color: #ff8800;
+            box-shadow: 0 0 30px rgba(255, 136, 0, 0.5);
+        }
+
+        .gallery-overlay .gallery-counter {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #00ff41;
+            font-size: 16px;
+            background: rgba(0,0,0,0.8);
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 1px solid #00ff41;
+        }
+
+        .gallery-overlay .fullscreen-view {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.98);
+            z-index: 10002;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .gallery-overlay .fullscreen-view.active {
+            display: flex;
+        }
+        .gallery-overlay .fullscreen-view img {
+            max-width: 95%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 10px;
+            border: 3px solid #00ff41;
+            box-shadow: 0 0 60px rgba(0, 255, 65, 0.4);
+            animation: zoomIn 0.3s ease;
+        }
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .gallery-overlay .fullscreen-view .fs-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #ff0040;
+            font-size: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            text-shadow: 0 0 30px rgba(255, 0, 64, 0.5);
+            z-index: 10003;
+            user-select: none;
+        }
+        .gallery-overlay .fullscreen-view .fs-close:hover {
+            transform: rotate(90deg);
+            color: #ff4400;
+        }
+        .gallery-overlay .fullscreen-view .fs-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #00ff41;
+            font-size: 60px;
+            font-weight: bold;
+            cursor: pointer;
+            text-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
+            padding: 20px 30px;
+            transition: 0.3s;
+            user-select: none;
+            z-index: 10003;
+            opacity: 0.6;
+        }
+        .gallery-overlay .fullscreen-view .fs-arrow:hover {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.1);
+            text-shadow: 0 0 50px rgba(0, 255, 65, 0.8);
+        }
+        .gallery-overlay .fullscreen-view .fs-arrow.left {
+            left: 10px;
+        }
+        .gallery-overlay .fullscreen-view .fs-arrow.right {
+            right: 10px;
+        }
+        .gallery-overlay .fullscreen-view .fs-counter {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #00ff41;
+            font-size: 18px;
+            background: rgba(0,0,0,0.8);
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 1px solid #00ff41;
+        }
+
+        @media (max-width: 600px) {
+            .gallery-overlay .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
+                padding: 10px;
+            }
+            .gallery-overlay .gallery-grid img {
+                height: 120px;
+            }
+            .gallery-overlay .close-gallery {
+                font-size: 35px;
+                top: 10px;
+                right: 15px;
+            }
+            .gallery-overlay .fullscreen-view .fs-arrow {
+                font-size: 30px;
+                padding: 10px 15px;
+            }
+            .gallery-overlay .fullscreen-view .fs-close {
+                font-size: 35px;
+                top: 10px;
+                right: 15px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+
+    <!-- ===== СТРАНИЦА ВХОДА ===== -->
+    <div class="login-page" id="loginPage">
+        <div class="login-box">
+            <h1>🔐 ДОСТУП ОГРАНИЧЕН</h1>
+            <p class="sub">Введите пароль для входа</p>
+            <input type="password" id="passwordInput" placeholder="Введите пароль" autofocus>
+            <button id="loginBtn">▶ ВОЙТИ</button>
+            <div class="error" id="loginError"></div>
+            <div class="hint">Подсказка: <span>****</span></div>
+        </div>
+    </div>
+
+    <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
+    <div class="container" id="mainContent" style="display:none;">
         <div class="header">
             <h1>⚡ Смена тарифа / оператора ⚡</h1>
             <p class="sub">Конфиденциально | Внутренний отчёт <span class="live-badge">LIVE</span></p>
         </div>
 
-        <!-- ПРОБИВКА -->
         <div class="probiv">
             <h2>🔎 ПРОБИВКА ДАННЫХ АБОНЕНТА</h2>
             <p><strong>ФИО:</strong> Константин Бекмурзин</p>
             <p><strong>Возраст:</strong> 13 лет</p>
-            <p><strong>Адрес регистрации:</strong> г. Самара, пос. Волжанка, ул. Центральная, д. 5, кв. 12</p>
-            <p><strong>Адрес по факту (лагерь):</strong> Самарская обл., Волжский р-н, ДОЛ «Солнечный», корп. 3</p>
-            <p><strong>Паспорт:</strong> 36 04 123456, выдан ОВД Волжского района г. Самары</p>
-            <p><strong>Семейное положение:</strong> женат на Карине (детей нет)</p>
-            <p><strong>Место работы:</strong> ООО «Апельсин» (продавец-консультант)</p>
-            <p><strong>Судимости:</strong> не значится</p>
-            <p><strong>Соцсети:</strong> VK: vk.com/kostya_samara, Telegram: @kostya_samara</p>
+            <p><strong>Влюблен:</strong> в Карину (безответно)</p>
+            <p><strong>Адрес по факту (лагерь):</strong> ул. Советской Армии, 251, корп. 8, Самара</p>
             <p><strong>Биометрия (последний снимок):</strong> 07.07.2026 02:14</p>
         </div>
 
-        <!-- СОЦИАЛЬНЫЕ СВЯЗИ -->
         <div class="social">
             <h2>👥 СОЦИАЛЬНЫЕ СВЯЗИ</h2>
-            <p><strong>Худший друг (по данным осведомителя):</strong> Дмитрий Соколов (проживает в комнате 412, контакт нестабилен)</p>
-            <p><strong>Враг (по имени Костя):</strong> Костя Белов (конфликт из-за сим-карты, переданной третьему лицу). Зафиксированы угрозы в чатах.</p>
-            <p><strong>Связи с вожатыми:</strong> неофициальные, через третьих лиц (вожатый 2-го отряда, имя скрыто)</p>
-            <p><strong>Связи с криминальными элементами:</strong> подозреваются, но не подтверждены (данные в обработке)</p>
-            <p><strong>Дружеские связи в лагере:</strong> около 5 человек из 1-го отряда, доверительные отношения</p>
+            <p><strong>Худший друг:</strong> [СКРЫТО]</p>
+            <p><strong>Враг:</strong> [СКРЫТО]</p>
+            <p><strong>Связи с вожатыми:</strong> [СКРЫТО]</p>
+            <p><strong>Связи с криминальными элементами:</strong> [СКРЫТО]</p>
+            <p><strong>Дружеские связи в лагере:</strong> [СКРЫТО]</p>
         </div>
 
-        <!-- ЛИЧНЫЕ ПРЕДПОЧТЕНИЯ (ОБНОВЛЕНО) -->
         <div class="preferences">
             <h2>🍕 ЛИЧНЫЕ ПРЕДПОЧТЕНИЯ</h2>
             <p><strong>Любимая пицца:</strong> «Додо Пицца», с ананасами и пепперони (Гавайская с пепперони)</p>
@@ -331,7 +743,6 @@
             <p><strong>Любит KFC:</strong> картофель фри, наггетсы, зельцеры (регулярно заказывает)</p>
         </div>
 
-        <!-- ФИНАНСЫ -->
         <div class="finance">
             <h2>💰 ФИНАНСОВОЕ ПОЛОЖЕНИЕ</h2>
             <p><strong>Статус:</strong> бомж</p>
@@ -344,15 +755,15 @@
             <p><strong>Доходы:</strong> не зафиксированы</p>
         </div>
 
-        <!-- ЛАГЕРЬ -->
         <div class="camp-info">
-            <h2>🏕️ ВНУТРЕННИЕ ДАННЫЕ (ЛАГЕРЬ «СОЛНЕЧНЫЙ»)</h2>
+            <h2>🏕️ ВНУТРЕННИЕ ДАННЫЕ (ЛАГЕРЬ)</h2>
+            <p><strong>Адрес лагеря:</strong> ул. Советской Армии, 251, корп. 8, Самара</p>
             <p><strong>Комната:</strong> 407 (рядом с общим холлом)</p>
             <p><strong>Этаж:</strong> 4-й</p>
             <p><strong>Соседние отряды:</strong> 1-й, 2-й, 3-й отряд (живут на том же этаже)</p>
             <p><strong>Знакомства:</strong> лично знаком с половиной состава 1-го и 2-го отрядов</p>
             <p><strong>Связи:</strong> хорошие, стабильные, есть выход на старших вожатых</p>
-            <p><strong>Враги (зафиксировано):</strong> 3 человека из 3-го отряда (конфликт из-за территории в холле)</p>
+            <p><strong>Враги:</strong> [СКРЫТО]</p>
             <p><strong>Устройство:</strong> кнопочный телефон (не смартфон) — зафиксировано по IMEI</p>
             <p><strong>Сим-карты:</strong> 2 шт. (одна активна, вторая заблокирована после передачи третьему лицу — зафиксировано в логах)</p>
             <p><strong>Источник данных:</strong> устная информация, переданная от врагов (неофициальный канал)</p>
@@ -360,11 +771,17 @@
             <p><strong>Последняя активность Wi-Fi:</strong> 07.07.2026 02:47 (точка доступа «Солнечный-Гостевой»)</p>
         </div>
 
-        <!-- УТЕЧКА В ИНТЕРНЕТ -->
+        <div class="enemy-comment">
+            <h2>💀 КОММЕНТАРИЙ ОТ ВРАГА 💀</h2>
+            <div class="comment-text">
+                <strong>«Тупой крыса!</strong> Сам не даёт поспать ночью нормально, а потом говорит, что не выспался. И попрошайничает! Телефон разбил — Galaxy A10, отдали 2к, но ненависть есть, достаёт, и я его ненавижу! Врёт, всё время жалуется и т.д.!»
+            </div>
+        </div>
+
         <div class="leak-warning">
             <h2>⚠️ ДАННЫЕ БУДУТ ОПУБЛИКОВАНЫ В ИНТЕРНЕТЕ</h2>
-            <div class="timer" id="leak-timer">23:59:59</div>
-            <p>Полная информация (включая фото, паспорт, кредит, соцсети, связи с врагами, сим-карты и даже любимые блюда) появится в открытых источниках по истечении времени. Отмена невозможна.</p>
+            <div class="timer" id="leak-timer">23:59:59.99</div>
+            <p>Полная информация (включая фото, кредит, связи с врагами, сим-карты и даже любимые блюда) появится в открытых источниках по истечении времени. Отмена невозможна.</p>
             <p style="color:#ff8844; font-size:13px; margin-top:5px;">Дата публикации: 08.07.2026 03:33 (МСК)</p>
         </div>
 
@@ -388,8 +805,21 @@
             </div>
         </div>
 
+        <button class="gallery-btn" id="openGalleryBtn">📸 Открыть галерею (29 фото)</button>
+
+        <!-- ===== НАМЁК ===== -->
+        <div class="hint-message">
+            <p>⚠️ Не ищи, кто это сделал — иначе будут проблемы (проблемы тоже)</p>
+            <div class="small">Ты уже знаешь достаточно. Дальше — только хуже.</div>
+        </div>
+
+        <!-- ===== ШПИОНЫ ===== -->
+        <div class="spy-message">
+            <p>🕵️ Наши шпионы везде: в комментах, в туалетах, в столовой, в душе — и даже в твоей голове. Не пытайся спрятаться.</p>
+        </div>
+
         <div class="warning">
-            ⚠️ Я знаю, что ты КОНСТАНТИН. Ты давал сим-карту две? Мы знаем, кому — твоему врагу Косте. Твой старый номер уже разослал этот новый всем твоим контактам. Ты не сможешь это отменить.
+            ⚠️ Я знаю, что ты КОНСТАНТИН. Ты давал сим-карту две? Мы знаем, кому — скрытому лицу. Твой старый номер уже разослал этот новый всем твоим контактам. Ты не сможешь это отменить.
         </div>
 
         <div class="footer">
@@ -397,38 +827,250 @@
         </div>
     </div>
 
+    <!-- ===== ГАЛЕРЕЯ ===== -->
+    <div class="gallery-overlay" id="galleryOverlay">
+        <span class="close-gallery" id="closeGallery">✕</span>
+        <div class="gallery-grid" id="galleryGrid"></div>
+        <div class="gallery-counter" id="galleryCounter">0 фото</div>
+
+        <div class="fullscreen-view" id="fullscreenView">
+            <span class="fs-close" id="fsClose">✕</span>
+            <span class="fs-arrow left" id="fsPrev">‹</span>
+            <span class="fs-arrow right" id="fsNext">›</span>
+            <img id="fsImage" src="" alt="Фото">
+            <div class="fs-counter" id="fsCounter">1 / 1</div>
+        </div>
+    </div>
+
     <script>
-        // Таймер до публикации данных (24 часа от текущего момента)
-        const targetTime = new Date();
-        targetTime.setHours(targetTime.getHours() + 24);
-        targetTime.setMinutes(33);
-        targetTime.setSeconds(0);
+        // ===== ЗАЩИТА ПАРОЛЕМ =====
+        const PASSWORD = "2026";
+        const loginPage = document.getElementById('loginPage');
+        const mainContent = document.getElementById('mainContent');
+        const passwordInput = document.getElementById('passwordInput');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginError = document.getElementById('loginError');
 
-        const timerEl = document.getElementById('leak-timer');
-
-        function formatTime(ms) {
-            const totalSec = Math.floor(ms / 1000);
-            const h = String(Math.floor(totalSec / 3600)).padStart(2, '0');
-            const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
-            const s = String(totalSec % 60).padStart(2, '0');
-            return `${h}:${m}:${s}`;
+        if (sessionStorage.getItem('loggedIn') === 'true') {
+            loginPage.classList.add('hidden');
+            mainContent.style.display = 'block';
+        } else {
+            mainContent.style.display = 'none';
         }
 
-        function updateTimer() {
-            const now = new Date();
-            const diff = targetTime - now;
-            if (diff <= 0) {
-                timerEl.textContent = '00:00:00';
-                document.querySelector('.leak-warning').style.borderColor = '#ff0000';
-                document.querySelector('.leak-warning h2').style.color = '#ff0000';
-                document.querySelector('.leak-warning h2').textContent = '⚠️ ДАННЫЕ ОПУБЛИКОВАНЫ';
-                return;
+        function tryLogin() {
+            const pass = passwordInput.value.trim();
+            if (pass === PASSWORD) {
+                sessionStorage.setItem('loggedIn', 'true');
+                loginPage.classList.add('hidden');
+                mainContent.style.display = 'block';
+                loginError.textContent = '';
+                initTimer();
+                initGallery();
+            } else {
+                loginError.textContent = '❌ Неверный пароль!';
+                passwordInput.value = '';
+                passwordInput.focus();
+                setTimeout(() => {
+                    loginError.textContent = '';
+                }, 2000);
             }
-            timerEl.textContent = formatTime(diff);
         }
 
-        updateTimer();
-        setInterval(updateTimer, 1000);
+        loginBtn.addEventListener('click', tryLogin);
+        passwordInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') tryLogin();
+        });
+
+        // ===== ТАЙМЕР =====
+        function initTimer() {
+            if (window.timerStarted) return;
+            window.timerStarted = true;
+
+            const targetTime = new Date();
+            targetTime.setHours(targetTime.getHours() + 24);
+            targetTime.setMinutes(33);
+            targetTime.setSeconds(0);
+            targetTime.setMilliseconds(0);
+
+            const timerEl = document.getElementById('leak-timer');
+
+            function formatTime(ms) {
+                const totalSec = Math.floor(ms / 1000);
+                const h = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+                const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+                const s = String(totalSec % 60).padStart(2, '0');
+                const millis = String(Math.floor((ms % 1000) / 10)).padStart(2, '0');
+                return `${h}:${m}:${s}.${millis}`;
+            }
+
+            function updateTimer() {
+                const now = new Date();
+                const diff = targetTime - now;
+                if (diff <= 0) {
+                    timerEl.textContent = '00:00:00.00';
+                    const leak = document.querySelector('.leak-warning');
+                    if (leak) {
+                        leak.style.borderColor = '#ff0000';
+                        leak.querySelector('h2').style.color = '#ff0000';
+                        leak.querySelector('h2').textContent = '⚠️ ДАННЫЕ ОПУБЛИКОВАНЫ';
+                    }
+                    return;
+                }
+                timerEl.textContent = formatTime(diff);
+            }
+
+            updateTimer();
+            setInterval(updateTimer, 10);
+        }
+
+        // ===== ГАЛЕРЕЯ (29 фото) =====
+        function initGallery() {
+            if (window.galleryStarted) return;
+            window.galleryStarted = true;
+
+            const images = [
+                "0Zt7KQrC1oQmGuSreUXbf_BvuyKFpoXriEilG2_lv42n3q_n1jjM1xOiNN0fwTNtboxePwmVmbZ4WJCRy5VAQYPi.jpg",
+                "6awl8cMj2gBLStuPyLUFd12ZZpk0Yq38sGw4mGiZ2yj9sxRKSCSK7NyHRysNDT2INIdbQMteWodnMiHZV8vNv8A7.jpg",
+                "7g1RMYQwji_TA5kHGKFVsKhLsl9f12mZsmqv6vNTi3kIR5Bcl6iZRoeAZSlIWEdoiU_jiZQPzj1za_kh3jGT4F_S.jpg",
+                "8HZzWwAtr6zO0XX3tuKgjRm9mRa4lCqBePyz4mtZvq-XTXuhuKwx7op_v8VMk7xbn0zOpsE1FMkBWj40Ne9z7Sjk.jpg",
+                "8mmLag0xjSUUERW8KkGxyK1uzU5eu_WEbACqdcJ4BlDuGLPO-heBS0c6kIDXfrpHd5dK_0FvxdMKOsx0sDl6Tcks.jpg",
+                "FYHqZE21Z6ncXDyGnIUp_PWsXDTpHjOl-mxxF3zZkY6fvcjAi0vHO1CW3R10dRucR7rG_ttkOaBz2MIBmU8DtPzT.jpg",
+                "HqKpxdOGLJj-mtPQwT67VMaI_C98QD11h9Oa4T6ZQYQhODOEUQEaf2XI7IcoKriIYYcgkmbFSlK7-f4IfFGM1r9N.jpg",
+                "IMG_20260707_211619_325.jpg",
+                "J9vZeXGlo5rjHWCRsZZ-afjnpHGFhSyg4ZeC4XxSMSOEV_BY_-n2SllUwMy7OQa5ucwjAWSQ2pUvmthhmVDpB0ti.jpg",
+                "JrSvvDd5_f-mkJB1v3F1yV3ouIvMqx7fBiiI3_dXqr0w7QX9t2CJu6HlVHJswh9VtOSodjsLtWNZh3sZLIrCDYTr.jpg",
+                "MfhmTbdVvyAhg-IamVDDtFNpVNRDJRSujmjERaEBuZHtgE5CVxU_WPsHkqK_58-T5JC88RQXhJ5t9EhuReHYXYMC.jpg",
+                "PBnWZWIe05y403jZjo0I0YlPxl6W7QPg7dL2v2KOPX2tnUnH9C189StUNzsd3MML-jXSDM__DSoI3-MebutvU4RC.jpg",
+                "QXvyfP-xDDMGVy5Q-awhbMvjF9DHsPvBwVKhCsS-lXmBeghgyg-fHzw49qGCH-zBSvGELM2pW8grMcpiifpN7EAC.jpg",
+                "T7_yqyO4TDZnwgxr2z7Q4ge8l208uvFk-PeoRYAJ43zM_LVNh7bqAH939b5TTglWrpDdPkiC2fkGXBeeAFaM5MQF.jpg",
+                "XPQ7kAtiok_Z0Y5PmQ2UgRatr6Yi56sinSq7c9Pq4zYQykgtFEyqMRRlHmXOz9pzctdwkloG1n91Aixnu5JWyJ1F.jpg",
+                "Y23I7ejhb5905ZnxL10-y4gdCKbZ9gpeTnBgyG8JmLJOpZqP9Txpo7ObG5vITnVS7M_IQ-z20beJqIzfGwgra3BX.jpg",
+                "ZjA_BFzj4DR6Zmyavnt90Y5QGwLYF_LltEYhuSSy-xT1Fo0wS6vJCYN20j2mb9ErRBx9uSvw86i2tWNwdBLeC_56.jpg",
+                "cJtFj7zKchvwOYhkQ0OrwuE8w_g7Js3X45HxbeFVeHGKqLAr0Yyg8A1W3tTe2yJMLO727bXckIqhQW1nTpFrQK9F.jpg",
+                "czWdht1H1atqqo52eXahJqiVQMjkHvFvDT9k7-uxv8epLkCU9kXGN00ms03AN6ruPx-9NMgUD3XCtQvkwjXbvYBW.jpg",
+                "dSVT10DIV4dpoRliJSV1pfHp_Nx8NrtDvWpIfFNPCw2Fe-cmxg1Z6dEBC7Urm2wtbKO7c_786PnodkJwKpdJ-1lf.jpg",
+                "dSsDCOwmIGXfryJFIY3nb7kg0RKCyasJDiRCOqVoG4Czh_wsh5IDgNLafM75eyEpMwZ1mMg0P2VIuYIL0axkTVQC.jpg",
+                "krKCqDhd3aU81LYI8ujBkKPQy_09eWo-dKQq-mNuBIU8ESzSr6p9JoUiXhJYe_4N-gF58h9NY3-ckffGsnpH3TH3.jpg",
+                "mcDE63MpCeFH-vMaNk2FwbQe5_Bm-LEfCkwEWQ_eHR7iVIhp0Vkc7Q4hq97Z-ZyyJW15tI6oOyLcx33YmmVaTmbM.jpg",
+                "nh6lDLv0iiHFKFHjr8CL5OUBSxuOYVTJd--VUlDtHzdwsmUrgfkRZU5Ml940wTEglsSWYAXaN4yon5nQwyS0jojY.jpg",
+                "nsBuPJUmpQtpA5WzaqB6tmccL63H76hjajfFZQ-OwrXlPeaeE0EE_2laiTUs7RBNY7EDjDsqn1iT9fWWE5Uazv6z.jpg",
+                "qZ-3XD7chm6hy9OY3oLNapotmAE2tRTalTqV7eihzJuhMDOyqjn3pbwGIRD_DHQZ-zpBjEs_H7BZNH0XfTpSzRPF.jpg",
+                "r-NLDzXSNcvwDkZRY27XtQlMuRMvpJ5bKwFJpSXzRv6AZquYmMc-cYQFqS1KkFjZo0ZPZ43TWACPzvYMv1eiWFAn.jpg",
+                "yGl6dQ1xcnk88BPFa6zK9jep2WwXL8HnQ6oQAbsLZ_knxY0w_6Ud9qi4MG2WADH8BzG5lJN11dVweX1MoVVY9WQy.jpg",
+                "zKbAROI_aXqwWYqFX0EjacrPIXecfails6i4S9joCOm_uGZNJQ4F5zZCFGwX7im_qNXYVDCGRYrgIQAAiYI1dWT3.jpg"
+            ];
+
+            const galleryOverlay = document.getElementById('galleryOverlay');
+            const galleryGrid = document.getElementById('galleryGrid');
+            const galleryCounter = document.getElementById('galleryCounter');
+            const openBtn = document.getElementById('openGalleryBtn');
+            const closeBtn = document.getElementById('closeGallery');
+
+            const fullscreenView = document.getElementById('fullscreenView');
+            const fsImage = document.getElementById('fsImage');
+            const fsCounter = document.getElementById('fsCounter');
+            const fsClose = document.getElementById('fsClose');
+            const fsPrev = document.getElementById('fsPrev');
+            const fsNext = document.getElementById('fsNext');
+
+            let currentIndex = 0;
+
+            images.forEach((imgName, index) => {
+                const img = document.createElement('img');
+                img.src = imgName;
+                img.alt = 'Фото';
+                img.loading = 'lazy';
+                img.addEventListener('click', () => openFullscreen(index));
+                galleryGrid.appendChild(img);
+            });
+
+            galleryCounter.textContent = `${images.length} фото`;
+
+            function openFullscreen(index) {
+                currentIndex = index;
+                fsImage.src = images[index];
+                fsCounter.textContent = `${index + 1} / ${images.length}`;
+                fullscreenView.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeFullscreen() {
+                fullscreenView.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            function nextImage() {
+                currentIndex = (currentIndex + 1) % images.length;
+                fsImage.src = images[currentIndex];
+                fsCounter.textContent = `${currentIndex + 1} / ${images.length}`;
+            }
+
+            function prevImage() {
+                currentIndex = (currentIndex - 1 + images.length) % images.length;
+                fsImage.src = images[currentIndex];
+                fsCounter.textContent = `${currentIndex + 1} / ${images.length}`;
+            }
+
+            openBtn.addEventListener('click', () => {
+                galleryOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+
+            closeBtn.addEventListener('click', () => {
+                galleryOverlay.classList.remove('active');
+                closeFullscreen();
+                document.body.style.overflow = '';
+            });
+
+            galleryOverlay.addEventListener('click', (e) => {
+                if (e.target === galleryOverlay) {
+                    galleryOverlay.classList.remove('active');
+                    closeFullscreen();
+                    document.body.style.overflow = '';
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (fullscreenView.classList.contains('active')) {
+                        closeFullscreen();
+                    } else if (galleryOverlay.classList.contains('active')) {
+                        galleryOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                }
+                if (e.key === 'ArrowRight' && fullscreenView.classList.contains('active')) nextImage();
+                if (e.key === 'ArrowLeft' && fullscreenView.classList.contains('active')) prevImage();
+            });
+
+            fsClose.addEventListener('click', closeFullscreen);
+            fsNext.addEventListener('click', (e) => { e.stopPropagation(); nextImage(); });
+            fsPrev.addEventListener('click', (e) => { e.stopPropagation(); prevImage(); });
+
+            let touchStartX = 0;
+            let touchEndX = 0;
+            fullscreenView.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+            fullscreenView.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                const diff = touchStartX - touchEndX;
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0) nextImage();
+                    else prevImage();
+                }
+            });
+
+            console.log('✅ Галерея загружена! Фото:', images.length);
+        }
+
+        if (sessionStorage.getItem('loggedIn') === 'true') {
+            setTimeout(() => {
+                initTimer();
+                initGallery();
+            }, 100);
+        }
     </script>
 </body>
-</html>
+</html>p
