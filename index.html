@@ -425,7 +425,6 @@
             50% { opacity:0.2; }
         }
 
-        /* === НАМЁК === */
         .hint-message {
             background: #1a001a;
             padding: 15px;
@@ -451,7 +450,6 @@
             text-shadow: none;
         }
 
-        /* === ШПИОНЫ === */
         .spy-message {
             background: #001a00;
             padding: 15px;
@@ -505,7 +503,7 @@
             color: #00ff41;
         }
 
-        /* === ГАЛЕРЕЯ === */
+        /* === ГАЛЕРЕЯ (ОВЕРЛЕЙ) === */
         .gallery-overlay {
             display: none;
             position: fixed;
@@ -556,20 +554,42 @@
             overflow-y: auto;
             padding: 20px;
         }
-        .gallery-overlay .gallery-grid img {
+        .gallery-overlay .gallery-grid .media-item {
+            position: relative;
             width: 100%;
-            height: 180px;
-            object-fit: cover;
+            padding-bottom: 100%;
+            background: #1a1a1a;
             border-radius: 10px;
             border: 2px solid #00ff41;
+            overflow: hidden;
             cursor: pointer;
             transition: 0.3s;
             box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
         }
-        .gallery-overlay .gallery-grid img:hover {
-            transform: scale(1.05);
+        .gallery-overlay .gallery-grid .media-item:hover {
+            transform: scale(1.03);
             border-color: #ff8800;
             box-shadow: 0 0 30px rgba(255, 136, 0, 0.5);
+        }
+        .gallery-overlay .gallery-grid .media-item img,
+        .gallery-overlay .gallery-grid .media-item video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .gallery-overlay .gallery-grid .media-item .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 50px;
+            color: #fff;
+            text-shadow: 0 0 30px rgba(0,0,0,0.8);
+            pointer-events: none;
+            opacity: 0.8;
         }
 
         .gallery-overlay .gallery-counter {
@@ -585,6 +605,7 @@
             border: 1px solid #00ff41;
         }
 
+        /* === ПОЛНОЭКРАННЫЙ ПРОСМОТР (ФОТО/ВИДЕО) === */
         .gallery-overlay .fullscreen-view {
             display: none;
             position: fixed;
@@ -601,7 +622,8 @@
         .gallery-overlay .fullscreen-view.active {
             display: flex;
         }
-        .gallery-overlay .fullscreen-view img {
+        .gallery-overlay .fullscreen-view img,
+        .gallery-overlay .fullscreen-view video {
             max-width: 95%;
             max-height: 90%;
             object-fit: contain;
@@ -609,6 +631,12 @@
             border: 3px solid #00ff41;
             box-shadow: 0 0 60px rgba(0, 255, 65, 0.4);
             animation: zoomIn 0.3s ease;
+            background: #000;
+        }
+        .gallery-overlay .fullscreen-view video {
+            width: 95%;
+            height: auto;
+            max-height: 90vh;
         }
         @keyframes zoomIn {
             from { transform: scale(0.8); opacity: 0; }
@@ -676,8 +704,8 @@
                 gap: 10px;
                 padding: 10px;
             }
-            .gallery-overlay .gallery-grid img {
-                height: 120px;
+            .gallery-overlay .gallery-grid .media-item {
+                padding-bottom: 100%;
             }
             .gallery-overlay .close-gallery {
                 font-size: 35px;
@@ -805,11 +833,11 @@
             </div>
         </div>
 
-        <button class="gallery-btn" id="openGalleryBtn">📸 Открыть галерею (29 фото)</button>
+        <button class="gallery-btn" id="openGalleryBtn">📸 Открыть галерею (29 фото + 1 видео)</button>
 
         <!-- ===== НАМЁК ===== -->
         <div class="hint-message">
-            <p>⚠️ Не ищи, кто это сделал — иначе будут проблемы (проблемы тоже)</p>
+            <p>⚠️ Не ищи, кто это сделал — иначе будут проблемы (и ромные тоже)</p>
             <div class="small">Ты уже знаешь достаточно. Дальше — только хуже.</div>
         </div>
 
@@ -831,13 +859,16 @@
     <div class="gallery-overlay" id="galleryOverlay">
         <span class="close-gallery" id="closeGallery">✕</span>
         <div class="gallery-grid" id="galleryGrid"></div>
-        <div class="gallery-counter" id="galleryCounter">0 фото</div>
+        <div class="gallery-counter" id="galleryCounter">0 элементов</div>
 
+        <!-- ПОЛНОЭКРАННЫЙ ПРОСМОТР -->
         <div class="fullscreen-view" id="fullscreenView">
             <span class="fs-close" id="fsClose">✕</span>
             <span class="fs-arrow left" id="fsPrev">‹</span>
             <span class="fs-arrow right" id="fsNext">›</span>
-            <img id="fsImage" src="" alt="Фото">
+            <div id="fsMediaContainer" style="width:100%; height:100%; display:flex; justify-content:center; align-items:center;">
+                <!-- сюда будет вставлено img или video -->
+            </div>
             <div class="fs-counter" id="fsCounter">1 / 1</div>
         </div>
     </div>
@@ -924,41 +955,43 @@
             setInterval(updateTimer, 10);
         }
 
-        // ===== ГАЛЕРЕЯ (29 фото) =====
+        // ===== ГАЛЕРЕЯ (ФОТО + ВИДЕО) =====
         function initGallery() {
             if (window.galleryStarted) return;
             window.galleryStarted = true;
 
-            const images = [
-                "0Zt7KQrC1oQmGuSreUXbf_BvuyKFpoXriEilG2_lv42n3q_n1jjM1xOiNN0fwTNtboxePwmVmbZ4WJCRy5VAQYPi.jpg",
-                "6awl8cMj2gBLStuPyLUFd12ZZpk0Yq38sGw4mGiZ2yj9sxRKSCSK7NyHRysNDT2INIdbQMteWodnMiHZV8vNv8A7.jpg",
-                "7g1RMYQwji_TA5kHGKFVsKhLsl9f12mZsmqv6vNTi3kIR5Bcl6iZRoeAZSlIWEdoiU_jiZQPzj1za_kh3jGT4F_S.jpg",
-                "8HZzWwAtr6zO0XX3tuKgjRm9mRa4lCqBePyz4mtZvq-XTXuhuKwx7op_v8VMk7xbn0zOpsE1FMkBWj40Ne9z7Sjk.jpg",
-                "8mmLag0xjSUUERW8KkGxyK1uzU5eu_WEbACqdcJ4BlDuGLPO-heBS0c6kIDXfrpHd5dK_0FvxdMKOsx0sDl6Tcks.jpg",
-                "FYHqZE21Z6ncXDyGnIUp_PWsXDTpHjOl-mxxF3zZkY6fvcjAi0vHO1CW3R10dRucR7rG_ttkOaBz2MIBmU8DtPzT.jpg",
-                "HqKpxdOGLJj-mtPQwT67VMaI_C98QD11h9Oa4T6ZQYQhODOEUQEaf2XI7IcoKriIYYcgkmbFSlK7-f4IfFGM1r9N.jpg",
-                "IMG_20260707_211619_325.jpg",
-                "J9vZeXGlo5rjHWCRsZZ-afjnpHGFhSyg4ZeC4XxSMSOEV_BY_-n2SllUwMy7OQa5ucwjAWSQ2pUvmthhmVDpB0ti.jpg",
-                "JrSvvDd5_f-mkJB1v3F1yV3ouIvMqx7fBiiI3_dXqr0w7QX9t2CJu6HlVHJswh9VtOSodjsLtWNZh3sZLIrCDYTr.jpg",
-                "MfhmTbdVvyAhg-IamVDDtFNpVNRDJRSujmjERaEBuZHtgE5CVxU_WPsHkqK_58-T5JC88RQXhJ5t9EhuReHYXYMC.jpg",
-                "PBnWZWIe05y403jZjo0I0YlPxl6W7QPg7dL2v2KOPX2tnUnH9C189StUNzsd3MML-jXSDM__DSoI3-MebutvU4RC.jpg",
-                "QXvyfP-xDDMGVy5Q-awhbMvjF9DHsPvBwVKhCsS-lXmBeghgyg-fHzw49qGCH-zBSvGELM2pW8grMcpiifpN7EAC.jpg",
-                "T7_yqyO4TDZnwgxr2z7Q4ge8l208uvFk-PeoRYAJ43zM_LVNh7bqAH939b5TTglWrpDdPkiC2fkGXBeeAFaM5MQF.jpg",
-                "XPQ7kAtiok_Z0Y5PmQ2UgRatr6Yi56sinSq7c9Pq4zYQykgtFEyqMRRlHmXOz9pzctdwkloG1n91Aixnu5JWyJ1F.jpg",
-                "Y23I7ejhb5905ZnxL10-y4gdCKbZ9gpeTnBgyG8JmLJOpZqP9Txpo7ObG5vITnVS7M_IQ-z20beJqIzfGwgra3BX.jpg",
-                "ZjA_BFzj4DR6Zmyavnt90Y5QGwLYF_LltEYhuSSy-xT1Fo0wS6vJCYN20j2mb9ErRBx9uSvw86i2tWNwdBLeC_56.jpg",
-                "cJtFj7zKchvwOYhkQ0OrwuE8w_g7Js3X45HxbeFVeHGKqLAr0Yyg8A1W3tTe2yJMLO727bXckIqhQW1nTpFrQK9F.jpg",
-                "czWdht1H1atqqo52eXahJqiVQMjkHvFvDT9k7-uxv8epLkCU9kXGN00ms03AN6ruPx-9NMgUD3XCtQvkwjXbvYBW.jpg",
-                "dSVT10DIV4dpoRliJSV1pfHp_Nx8NrtDvWpIfFNPCw2Fe-cmxg1Z6dEBC7Urm2wtbKO7c_786PnodkJwKpdJ-1lf.jpg",
-                "dSsDCOwmIGXfryJFIY3nb7kg0RKCyasJDiRCOqVoG4Czh_wsh5IDgNLafM75eyEpMwZ1mMg0P2VIuYIL0axkTVQC.jpg",
-                "krKCqDhd3aU81LYI8ujBkKPQy_09eWo-dKQq-mNuBIU8ESzSr6p9JoUiXhJYe_4N-gF58h9NY3-ckffGsnpH3TH3.jpg",
-                "mcDE63MpCeFH-vMaNk2FwbQe5_Bm-LEfCkwEWQ_eHR7iVIhp0Vkc7Q4hq97Z-ZyyJW15tI6oOyLcx33YmmVaTmbM.jpg",
-                "nh6lDLv0iiHFKFHjr8CL5OUBSxuOYVTJd--VUlDtHzdwsmUrgfkRZU5Ml940wTEglsSWYAXaN4yon5nQwyS0jojY.jpg",
-                "nsBuPJUmpQtpA5WzaqB6tmccL63H76hjajfFZQ-OwrXlPeaeE0EE_2laiTUs7RBNY7EDjDsqn1iT9fWWE5Uazv6z.jpg",
-                "qZ-3XD7chm6hy9OY3oLNapotmAE2tRTalTqV7eihzJuhMDOyqjn3pbwGIRD_DHQZ-zpBjEs_H7BZNH0XfTpSzRPF.jpg",
-                "r-NLDzXSNcvwDkZRY27XtQlMuRMvpJ5bKwFJpSXzRv6AZquYmMc-cYQFqS1KkFjZo0ZPZ43TWACPzvYMv1eiWFAn.jpg",
-                "yGl6dQ1xcnk88BPFa6zK9jep2WwXL8HnQ6oQAbsLZ_knxY0w_6Ud9qi4MG2WADH8BzG5lJN11dVweX1MoVVY9WQy.jpg",
-                "zKbAROI_aXqwWYqFX0EjacrPIXecfails6i4S9joCOm_uGZNJQ4F5zZCFGwX7im_qNXYVDCGRYrgIQAAiYI1dWT3.jpg"
+            // СПИСОК МЕДИАФАЙЛОВ
+            const mediaItems = [
+                { src: "0Zt7KQrC1oQmGuSreUXbf_BvuyKFpoXriEilG2_lv42n3q_n1jjM1xOiNN0fwTNtboxePwmVmbZ4WJCRy5VAQYPi.jpg", type: "image" },
+                { src: "6awl8cMj2gBLStuPyLUFd12ZZpk0Yq38sGw4mGiZ2yj9sxRKSCSK7NyHRysNDT2INIdbQMteWodnMiHZV8vNv8A7.jpg", type: "image" },
+                { src: "7g1RMYQwji_TA5kHGKFVsKhLsl9f12mZsmqv6vNTi3kIR5Bcl6iZRoeAZSlIWEdoiU_jiZQPzj1za_kh3jGT4F_S.jpg", type: "image" },
+                { src: "8HZzWwAtr6zO0XX3tuKgjRm9mRa4lCqBePyz4mtZvq-XTXuhuKwx7op_v8VMk7xbn0zOpsE1FMkBWj40Ne9z7Sjk.jpg", type: "image" },
+                { src: "8mmLag0xjSUUERW8KkGxyK1uzU5eu_WEbACqdcJ4BlDuGLPO-heBS0c6kIDXfrpHd5dK_0FvxdMKOsx0sDl6Tcks.jpg", type: "image" },
+                { src: "FYHqZE21Z6ncXDyGnIUp_PWsXDTpHjOl-mxxF3zZkY6fvcjAi0vHO1CW3R10dRucR7rG_ttkOaBz2MIBmU8DtPzT.jpg", type: "image" },
+                { src: "HqKpxdOGLJj-mtPQwT67VMaI_C98QD11h9Oa4T6ZQYQhODOEUQEaf2XI7IcoKriIYYcgkmbFSlK7-f4IfFGM1r9N.jpg", type: "image" },
+                { src: "IMG_20260707_211619_325.jpg", type: "image" },
+                { src: "J9vZeXGlo5rjHWCRsZZ-afjnpHGFhSyg4ZeC4XxSMSOEV_BY_-n2SllUwMy7OQa5ucwjAWSQ2pUvmthhmVDpB0ti.jpg", type: "image" },
+                { src: "JrSvvDd5_f-mkJB1v3F1yV3ouIvMqx7fBiiI3_dXqr0w7QX9t2CJu6HlVHJswh9VtOSodjsLtWNZh3sZLIrCDYTr.jpg", type: "image" },
+                { src: "MfhmTbdVvyAhg-IamVDDtFNpVNRDJRSujmjERaEBuZHtgE5CVxU_WPsHkqK_58-T5JC88RQXhJ5t9EhuReHYXYMC.jpg", type: "image" },
+                { src: "PBnWZWIe05y403jZjo0I0YlPxl6W7QPg7dL2v2KOPX2tnUnH9C189StUNzsd3MML-jXSDM__DSoI3-MebutvU4RC.jpg", type: "image" },
+                { src: "QXvyfP-xDDMGVy5Q-awhbMvjF9DHsPvBwVKhCsS-lXmBeghgyg-fHzw49qGCH-zBSvGELM2pW8grMcpiifpN7EAC.jpg", type: "image" },
+                { src: "T7_yqyO4TDZnwgxr2z7Q4ge8l208uvFk-PeoRYAJ43zM_LVNh7bqAH939b5TTglWrpDdPkiC2fkGXBeeAFaM5MQF.jpg", type: "image" },
+                { src: "XPQ7kAtiok_Z0Y5PmQ2UgRatr6Yi56sinSq7c9Pq4zYQykgtFEyqMRRlHmXOz9pzctdwkloG1n91Aixnu5JWyJ1F.jpg", type: "image" },
+                { src: "Y23I7ejhb5905ZnxL10-y4gdCKbZ9gpeTnBgyG8JmLJOpZqP9Txpo7ObG5vITnVS7M_IQ-z20beJqIzfGwgra3BX.jpg", type: "image" },
+                { src: "ZjA_BFzj4DR6Zmyavnt90Y5QGwLYF_LltEYhuSSy-xT1Fo0wS6vJCYN20j2mb9ErRBx9uSvw86i2tWNwdBLeC_56.jpg", type: "image" },
+                { src: "cJtFj7zKchvwOYhkQ0OrwuE8w_g7Js3X45HxbeFVeHGKqLAr0Yyg8A1W3tTe2yJMLO727bXckIqhQW1nTpFrQK9F.jpg", type: "image" },
+                { src: "czWdht1H1atqqo52eXahJqiVQMjkHvFvDT9k7-uxv8epLkCU9kXGN00ms03AN6ruPx-9NMgUD3XCtQvkwjXbvYBW.jpg", type: "image" },
+                { src: "dSVT10DIV4dpoRliJSV1pfHp_Nx8NrtDvWpIfFNPCw2Fe-cmxg1Z6dEBC7Urm2wtbKO7c_786PnodkJwKpdJ-1lf.jpg", type: "image" },
+                { src: "dSsDCOwmIGXfryJFIY3nb7kg0RKCyasJDiRCOqVoG4Czh_wsh5IDgNLafM75eyEpMwZ1mMg0P2VIuYIL0axkTVQC.jpg", type: "image" },
+                { src: "krKCqDhd3aU81LYI8ujBkKPQy_09eWo-dKQq-mNuBIU8ESzSr6p9JoUiXhJYe_4N-gF58h9NY3-ckffGsnpH3TH3.jpg", type: "image" },
+                { src: "mcDE63MpCeFH-vMaNk2FwbQe5_Bm-LEfCkwEWQ_eHR7iVIhp0Vkc7Q4hq97Z-ZyyJW15tI6oOyLcx33YmmVaTmbM.jpg", type: "image" },
+                { src: "nh6lDLv0iiHFKFHjr8CL5OUBSxuOYVTJd--VUlDtHzdwsmUrgfkRZU5Ml940wTEglsSWYAXaN4yon5nQwyS0jojY.jpg", type: "image" },
+                { src: "nsBuPJUmpQtpA5WzaqB6tmccL63H76hjajfFZQ-OwrXlPeaeE0EE_2laiTUs7RBNY7EDjDsqn1iT9fWWE5Uazv6z.jpg", type: "image" },
+                { src: "qZ-3XD7chm6hy9OY3oLNapotmAE2tRTalTqV7eihzJuhMDOyqjn3pbwGIRD_DHQZ-zpBjEs_H7BZNH0XfTpSzRPF.jpg", type: "image" },
+                { src: "r-NLDzXSNcvwDkZRY27XtQlMuRMvpJ5bKwFJpSXzRv6AZquYmMc-cYQFqS1KkFjZo0ZPZ43TWACPzvYMv1eiWFAn.jpg", type: "image" },
+                { src: "yGl6dQ1xcnk88BPFa6zK9jep2WwXL8HnQ6oQAbsLZ_knxY0w_6Ud9qi4MG2WADH8BzG5lJN11dVweX1MoVVY9WQy.jpg", type: "image" },
+                { src: "zKbAROI_aXqwWYqFX0EjacrPIXecfails6i4S9joCOm_uGZNJQ4F5zZCFGwX7im_qNXYVDCGRYrgIQAAiYI1dWT3.jpg", type: "image" },
+                { src: "VID_20260707_152619.mp4", type: "video" }   // новое видео
             ];
 
             const galleryOverlay = document.getElementById('galleryOverlay');
@@ -968,55 +1001,112 @@
             const closeBtn = document.getElementById('closeGallery');
 
             const fullscreenView = document.getElementById('fullscreenView');
-            const fsImage = document.getElementById('fsImage');
+            const fsContainer = document.getElementById('fsMediaContainer');
             const fsCounter = document.getElementById('fsCounter');
             const fsClose = document.getElementById('fsClose');
             const fsPrev = document.getElementById('fsPrev');
             const fsNext = document.getElementById('fsNext');
 
             let currentIndex = 0;
+            let currentMedia = null; // для хранения текущего элемента
 
-            images.forEach((imgName, index) => {
-                const img = document.createElement('img');
-                img.src = imgName;
-                img.alt = 'Фото';
-                img.loading = 'lazy';
-                img.addEventListener('click', () => openFullscreen(index));
-                galleryGrid.appendChild(img);
+            // Отрисовка сетки
+            mediaItems.forEach((item, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'media-item';
+
+                if (item.type === 'image') {
+                    const img = document.createElement('img');
+                    img.src = item.src;
+                    img.alt = 'Фото';
+                    img.loading = 'lazy';
+                    wrapper.appendChild(img);
+                } else if (item.type === 'video') {
+                    const video = document.createElement('video');
+                    video.src = item.src;
+                    video.muted = true;
+                    video.preload = 'metadata';
+                    video.setAttribute('playsinline', '');
+                    wrapper.appendChild(video);
+                    // Добавим значок воспроизведения
+                    const playIcon = document.createElement('div');
+                    playIcon.className = 'play-icon';
+                    playIcon.textContent = '▶';
+                    wrapper.appendChild(playIcon);
+                    // При наведении запускаем превью
+                    wrapper.addEventListener('mouseenter', () => {
+                        video.play().catch(() => {});
+                    });
+                    wrapper.addEventListener('mouseleave', () => {
+                        video.pause();
+                        video.currentTime = 0;
+                    });
+                }
+
+                wrapper.addEventListener('click', () => {
+                    openFullscreen(index);
+                });
+
+                galleryGrid.appendChild(wrapper);
             });
 
-            galleryCounter.textContent = `${images.length} фото`;
+            galleryCounter.textContent = `${mediaItems.length} элементов`;
 
             function openFullscreen(index) {
                 currentIndex = index;
-                fsImage.src = images[index];
-                fsCounter.textContent = `${index + 1} / ${images.length}`;
+                const item = mediaItems[index];
+                currentMedia = item;
+                fsContainer.innerHTML = ''; // очищаем
+
+                if (item.type === 'image') {
+                    const img = document.createElement('img');
+                    img.src = item.src;
+                    img.alt = 'Фото';
+                    fsContainer.appendChild(img);
+                } else if (item.type === 'video') {
+                    const video = document.createElement('video');
+                    video.src = item.src;
+                    video.controls = true;
+                    video.autoplay = true;
+                    video.setAttribute('playsinline', '');
+                    video.style.width = '95%';
+                    video.style.maxHeight = '90vh';
+                    fsContainer.appendChild(video);
+                }
+
+                fsCounter.textContent = `${index + 1} / ${mediaItems.length}`;
                 fullscreenView.classList.add('active');
                 document.body.style.overflow = 'hidden';
             }
 
             function closeFullscreen() {
                 fullscreenView.classList.remove('active');
+                // остановим видео, если оно есть
+                const video = fsContainer.querySelector('video');
+                if (video) {
+                    video.pause();
+                    video.currentTime = 0;
+                }
                 document.body.style.overflow = '';
             }
 
-            function nextImage() {
-                currentIndex = (currentIndex + 1) % images.length;
-                fsImage.src = images[currentIndex];
-                fsCounter.textContent = `${currentIndex + 1} / ${images.length}`;
+            function nextMedia() {
+                currentIndex = (currentIndex + 1) % mediaItems.length;
+                openFullscreen(currentIndex);
             }
 
-            function prevImage() {
-                currentIndex = (currentIndex - 1 + images.length) % images.length;
-                fsImage.src = images[currentIndex];
-                fsCounter.textContent = `${currentIndex + 1} / ${images.length}`;
+            function prevMedia() {
+                currentIndex = (currentIndex - 1 + mediaItems.length) % mediaItems.length;
+                openFullscreen(currentIndex);
             }
 
+            // Открыть галерею
             openBtn.addEventListener('click', () => {
                 galleryOverlay.classList.add('active');
                 document.body.style.overflow = 'hidden';
             });
 
+            // Закрыть галерею
             closeBtn.addEventListener('click', () => {
                 galleryOverlay.classList.remove('active');
                 closeFullscreen();
@@ -1031,6 +1121,7 @@
                 }
             });
 
+            // Клавиши
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     if (fullscreenView.classList.contains('active')) {
@@ -1040,14 +1131,21 @@
                         document.body.style.overflow = '';
                     }
                 }
-                if (e.key === 'ArrowRight' && fullscreenView.classList.contains('active')) nextImage();
-                if (e.key === 'ArrowLeft' && fullscreenView.classList.contains('active')) prevImage();
+                if (e.key === 'ArrowRight' && fullscreenView.classList.contains('active')) {
+                    e.preventDefault();
+                    nextMedia();
+                }
+                if (e.key === 'ArrowLeft' && fullscreenView.classList.contains('active')) {
+                    e.preventDefault();
+                    prevMedia();
+                }
             });
 
             fsClose.addEventListener('click', closeFullscreen);
-            fsNext.addEventListener('click', (e) => { e.stopPropagation(); nextImage(); });
-            fsPrev.addEventListener('click', (e) => { e.stopPropagation(); prevImage(); });
+            fsNext.addEventListener('click', (e) => { e.stopPropagation(); nextMedia(); });
+            fsPrev.addEventListener('click', (e) => { e.stopPropagation(); prevMedia(); });
 
+            // Свайпы для телефона
             let touchStartX = 0;
             let touchEndX = 0;
             fullscreenView.addEventListener('touchstart', (e) => {
@@ -1057,12 +1155,12 @@
                 touchEndX = e.changedTouches[0].screenX;
                 const diff = touchStartX - touchEndX;
                 if (Math.abs(diff) > 50) {
-                    if (diff > 0) nextImage();
-                    else prevImage();
+                    if (diff > 0) nextMedia();
+                    else prevMedia();
                 }
             });
 
-            console.log('✅ Галерея загружена! Фото:', images.length);
+            console.log('✅ Галерея загружена! Элементов:', mediaItems.length);
         }
 
         if (sessionStorage.getItem('loggedIn') === 'true') {
@@ -1073,4 +1171,4 @@
         }
     </script>
 </body>
-</html>p
+</html>
